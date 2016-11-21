@@ -18,6 +18,7 @@ ENV PHPIZE_DEPS \
 		re2c
 RUN apk add --no-cache --virtual .persistent-deps \
 		ca-certificates \
+		openldap-dev \
 		curl \
 		tar \
 		xz
@@ -89,7 +90,6 @@ RUN set -xe \
 	&& docker-php-source extract \
 	&& cd /usr/src/php \
 	&& ./configure \
-		--with-ldap-sasl \
 		--with-config-file-path="$PHP_INI_DIR" \
 		--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
 		\
@@ -178,6 +178,8 @@ RUN apk upgrade --update && apk add \
   libltdl \
   libmcrypt-dev \
   libpng-dev \
+&& docker-php-ext-configure ldap --with-libdir=lib/ \
+&& docker-php-ext-install ldap \
 && docker-php-ext-install -j$(nproc) iconv mcrypt \
 && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
 && docker-php-ext-install -j$(nproc) gd
